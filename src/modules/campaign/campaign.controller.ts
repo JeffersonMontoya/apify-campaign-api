@@ -57,4 +57,15 @@ export class CampaignController {
       res.status(400).json({ error: error.message });
     }
   }
+
+  // --- PASO 3: Traer porcentaje ---
+  async getProgress(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const progress = await service.getCampaignProgress(Number(id));
+      res.status(200).json(progress);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }

@@ -15,8 +15,29 @@ export class CampaignService {
     return await repository.addContactsToCampaign(campaignId, contactIds);
   }
 
+  async changeStatus(id: number, status: "running" | "paused") {
+    return await repository.updateStatus(id, status);
+  }
 
-  async changeStatus(id: number, status: 'running' | 'paused') {
-  return await repository.updateStatus(id, status);
-}
+  // --- PASO 3: Lógica para calcular porcentajes ---
+  async getCampaignProgress(id: number) {
+    const rawProgress = await repository.getProgress(id);
+
+    const total = parseInt(rawProgress.total, 10) || 0;
+    const pending = parseInt(rawProgress.pending, 10) || 0;
+    const sent = parseInt(rawProgress.sent, 10) || 0;
+    const failed = parseInt(rawProgress.failed, 10) || 0;
+
+    // Fórmula: Porcentaje es (Enviados + Fallidos) / Total
+    const completado =
+      total === 0 ? 0 : Math.round(((sent + failed) / total) * 100);
+
+    return {
+      total,
+      pending,
+      sent,
+      failed,
+      porcentaje_completado: completado,
+    };
+  }
 }
