@@ -8,49 +8,49 @@ Proyecto desarrollado como prueba técnica.
 - **Runtime:** Node.js
 - **Framework:** Express.js
 - **Lenguaje:** TypeScript
-- **Base de Datos:** PostgreSQL (`pg` library para consultas SQL nativas / raw SQL, gestionadas mediante Pools de Conexión).
-- **Arquitectura:** Diseño basado en capas (Rutas, Controladores, Servicios y Repositorios) para garantizar el Principio de Responsabilidad Única y lograr un código mantenible y escalable.
+- **Base de Datos:** PostgreSQL (`pg` library para consultas SQL nativas / raw SQL).
+- **Validación:** Zod
+- **Arquitectura:** Estructura Modular/Limpia:
+  - `controllers/`: Manejo de peticiones y respuestas.
+  - `services/`: Lógica de negocio y validaciones de existencia.
+  - `repositories/`: Consultas SQL directas a la base de datos.
+  - `routes/`: Definición de endpoints.
+  - `utils/`: Utilidades como el manejador de respuestas estandarizado.
 
-## ✅ Funcionalidades Logradas (Prueba 100% Completada)
+## ✅ Funcionalidades Logradas
 
-1. **Creación y Configuración:** Creación de campañas con control estricto de `rate_limit_per_minute` (POST `/campaigns`).
-2. **Contactos:** Algoritmo rápido para inyectar listas de destino cambiando su estado a inicial de "pending" (POST `/:id/contacts`).
-3. **Control de Estados Analógicos:** Puntos habilitados para `start`, `pause` y `resume` gestionando dinámicamente los estados `running` o `paused` de cada campaña.
-4. **Motor Asíncrono en Segundo Plano (Cron Job):**
-   - Servicio inyectado con `setInterval` que corre automáticamente.
-   - Selecciona campañas corriendo (`running`) y realiza Rate Limiting matemático directamente vía sentencias SQL `LIMIT N`.
-   - Modela envíos reales calculando al azar la suerte (90% enviados, 10% fallidos).
-   - Apagado inteligente al detectar que no restan contactos pendientes, mutando la campaña a `finished`.
-5. **Estadísticas de Rendimiento Puras:** Endpoint especial (GET `/progress`) alimentado por conteo nativo `COUNT(CASE WHEN...)` reduciendo la carga de memoria sobre V8/Node para mostrar los datos calculando los porcentajes exactos de manera progresiva.
+1. **Estructura Organizada:** Refactorización total a carpetas por responsabilidad (`controllers`, `services`, etc.).
+2. **Manejo de Respuestas:** Sistema estandarizado de respuestas con mensajes claros de éxito y error, incluyendo códigos HTTP adecuados.
+3. **Validación Robusta:** Validación de tipos y requerimientos mediante **Zod** y validaciones de existencia en base de datos en la capa de servicios.
+4. **Creación y Configuración:** Creación de campañas con control de `rate_limit_per_minute`.
+5. **Contactos:** Inyección rápida de listas de contactos.
+6. **Estadísticas:** Endpoint (GET `/progress`) que calcula porcentajes de envío en tiempo real.
 
 ---
 
 ## 🛠️ Instrucciones de Instalación Local
 
-1. Clona este repositorio y ubícate en la carpeta raíz.
+1. Clona el repositorio.
 2. Instala las dependencias:
    ```bash
    npm install
    ```
-3. Clona el archivo `.env.example` y renómbralo a `.env`:
+3. Configura las variables de entorno:
    ```bash
    cp .env.example .env
    ```
-4. Actualiza las credenciales de base de datos en el nuevo archivo `.env` según tu motor de base de datos local y asegúrate de crear una base de datos vacía.
+4. Actualiza las credenciales en el archivo `.env`.
 
-## 📦 Ejecución y Base de Datos (Migraciones)
+## 📦 Base de Datos y Ejecución
 
-Para crear rápidamente las tablas con restricciones (`campaigns`, `contacts` y `campaign_contacts`), ejecuta de manera automática nuestro seeder interno que cargará de paso usuarios de prueba falsos para ti:
+1. Asegúrate de tener PostgreSQL corriendo y crea la base de datos.
+2. Ejecuta el script SQL en `init.sql` o usa el seeder (si está disponible):
+   ```bash
+   node --loader ts-node/esm src/config/seed.ts
+   ```
+3. Inicia el servidor de desarrollo:
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npx ts-node --esm src/config/seed.ts
-# O en Windows: node --loader ts-node/esm src/config/seed.ts
-```
-
-Una vez instaladas las tablas, levanta el servidor de desarrollo mediante **nodemon**:
-
-```bash
-npm run dev
-```
-
-El servidor estará recibiendo peticiones en `http://localhost:3000`.
+El servidor estará en `http://localhost:3000`.

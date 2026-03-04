@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CampaignController } from "./campaign.controller.js";
+import { CampaignController } from "../controllers/campaign.controller.js";
 
 const router = Router();
 const controller = new CampaignController();
@@ -9,7 +9,6 @@ router.post("/:id/contacts", controller.addContacts.bind(controller));
 router.post("/:id/start", controller.start.bind(controller));
 router.post("/:id/pause", controller.pause.bind(controller));
 router.post("/:id/resume", controller.resume.bind(controller));
-
 
 router.get("/:id/progress", controller.getProgress.bind(controller));
 

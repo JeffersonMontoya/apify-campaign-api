@@ -1,7 +1,25 @@
-import pool from "../../config/db.js";
-import { type Campaign } from "./campaign.types.js";
+import pool from "../config/db.js";
+import { type Campaign } from "../types/campaign.types.js";
 
 export class CampaignRepository {
+  async findByName(name: string): Promise<Campaign | null> {
+    const query = `SELECT * FROM campaigns WHERE name = $1 LIMIT 1;`;
+    const { rows } = await pool.query(query, [name]);
+    return rows[0] || null;
+  }
+
+  async getExistingIds(ids: number[]): Promise<number[]> {
+    const query = `SELECT id FROM contacts WHERE id = ANY($1);`;
+    const { rows } = await pool.query(query, [ids]);
+    return rows.map((r) => r.id);
+  }
+
+  async findById(id: number): Promise<Campaign | null> {
+    const query = `SELECT * FROM campaigns WHERE id = $1 LIMIT 1;`;
+    const { rows } = await pool.query(query, [id]);
+    return rows[0] || null;
+  }
+
   async create(name: string, rateLimit: number): Promise<Campaign> {
     const query = `
       INSERT INTO campaigns (name, rate_limit_per_minute, status)
@@ -11,7 +29,6 @@ export class CampaignRepository {
     const { rows } = await pool.query(query, [name, rateLimit]);
     return rows[0];
   }
-
 
   async addContactsToCampaign(
     campaignId: number,
@@ -36,7 +53,6 @@ export class CampaignRepository {
     `;
     await pool.query(query, [status, campaignId]);
   }
-
 
   async getProgress(campaignId: number) {
     const query = `

@@ -69,7 +69,7 @@ class CampaignProcessor {
 
     if (contacts.length === 0) {
       // 3. Revisamos si ya no quedan NADA de pendientes absolutos para terminar la campaña
-      const checkPendingQuery = `SELECT COUNT(*) FROM campaign_contacts WHERE campaign_id = $1 AND status = 'pending'`;
+      const checkPendingQuery = `SELECT COUNT(*) as count FROM campaign_contacts WHERE campaign_id = $1 AND status = 'pending'`;
       const { rows: check } = await pool.query(checkPendingQuery, [campaignId]);
 
       if (parseInt(check[0].count, 10) === 0) {
