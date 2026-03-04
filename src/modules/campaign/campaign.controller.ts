@@ -58,7 +58,7 @@ export class CampaignController {
     }
   }
 
-  // --- PASO 3: Traer porcentaje ---
+
   async getProgress(req: Request, res: Response) {
     try {
       const { id } = req.params;

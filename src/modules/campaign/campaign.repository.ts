@@ -12,7 +12,7 @@ export class CampaignRepository {
     return rows[0];
   }
 
-  // Vincular una lista de IDs de contactos a la campaña en la tabla pivote
+
   async addContactsToCampaign(
     campaignId: number,
     contactIds: number[],
@@ -37,7 +37,7 @@ export class CampaignRepository {
     await pool.query(query, [status, campaignId]);
   }
 
-  // --- PASO 3: Obtener el progreso ---
+
   async getProgress(campaignId: number) {
     const query = `
       SELECT 

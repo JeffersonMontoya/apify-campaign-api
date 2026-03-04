@@ -23,9 +23,3 @@ CREATE TABLE campaign_contacts (
     last_error TEXT,
     sent_at TIMESTAMP
 );
-
-
-INSERT INTO contacts (name, phone) VALUES 
-('Juan Perez', '3001112233'),
-('Maria Lopez', '3004445566'),
-('Estefania Restrepo', '3007778899');

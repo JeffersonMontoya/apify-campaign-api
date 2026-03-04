@@ -10,7 +10,7 @@ router.post("/:id/start", controller.start.bind(controller));
 router.post("/:id/pause", controller.pause.bind(controller));
 router.post("/:id/resume", controller.resume.bind(controller));
 
-// Paso 3: Progreso
+
 router.get("/:id/progress", controller.getProgress.bind(controller));
 
 export default router;
