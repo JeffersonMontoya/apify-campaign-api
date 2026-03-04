@@ -26,7 +26,6 @@ Proyecto desarrollado como prueba técnica.
 5. **Contactos:** Inyección rápida de listas de contactos.
 6. **Estadísticas:** Endpoint (GET `/progress`) que calcula porcentajes de envío en tiempo real.
 
----
 
 ## 🛠️ Instrucciones de Instalación Local
 
