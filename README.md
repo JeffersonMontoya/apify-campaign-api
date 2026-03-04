@@ -1,24 +1,27 @@
 # Apify Campaign API
 
-API REST para la gestión y envío de campañas de mensajería, desarrollada en **Node.js, Express y TypeScript** utilizando **PosgreSQL** como base de datos con consultas SQL directas.
+API REST para la gestión y simulación de envío masivo de campañas de mensajería, desarrollada en **Node.js, Express y TypeScript** utilizando **PostgreSQL** como base de datos con consultas SQL directas.  
+Proyecto desarrollado como prueba técnica.
 
-## 🚀 Tecnologías Utilizadas
+## 🚀 Tecnologías y Arquitectura Utilizadas
 
 - **Runtime:** Node.js
 - **Framework:** Express.js
 - **Lenguaje:** TypeScript
-- **Base de Datos:** PostgreSQL (`pg` library para consultas raw SQL)
+- **Base de Datos:** PostgreSQL (`pg` library para consultas SQL nativas / raw SQL, gestionadas mediante Pools de Conexión).
+- **Arquitectura:** Diseño basado en capas (Rutas, Controladores, Servicios y Repositorios) para garantizar el Principio de Responsabilidad Única y lograr un código mantenible y escalable.
 
-## 📌 Avance Actual (Paso 1 y 2 COMPLETADOS)
+## ✅ Funcionalidades Logradas (Prueba 100% Completada)
 
-En esta rama, el API es capaz de:
-
-1. **Infraestructura:** Conexión exitosa a PostgreSQL mediante la configuración de Pool.
-2. **Creación:** Insertar nuevas campañas en la tabla `campaigns` configurando sus límites de rate limit (`/campaigns`).
-3. **Asignación:** Recibir un arreglo de IDs y rellenar la tabla pivote de `campaign_contacts` con su estado inicial de "pending" (`/:id/contacts`).
-4. **Control de Estados (State Machine):** Actualizar exitosamente los estados de la campaña a `running`, `paused` o de vuelta a running (`/:id/start`, `/:id/pause`, `/:id/resume`).
-
-_Los siguientes pasos (Analítica/Progreso en `/progress` y el Background Job) se completarán posteriormente._
+1. **Creación y Configuración:** Creación de campañas con control estricto de `rate_limit_per_minute` (POST `/campaigns`).
+2. **Contactos:** Algoritmo rápido para inyectar listas de destino cambiando su estado a inicial de "pending" (POST `/:id/contacts`).
+3. **Control de Estados Analógicos:** Puntos habilitados para `start`, `pause` y `resume` gestionando dinámicamente los estados `running` o `paused` de cada campaña.
+4. **Motor Asíncrono en Segundo Plano (Cron Job):**
+   - Servicio inyectado con `setInterval` que corre automáticamente.
+   - Selecciona campañas corriendo (`running`) y realiza Rate Limiting matemático directamente vía sentencias SQL `LIMIT N`.
+   - Modela envíos reales calculando al azar la suerte (90% enviados, 10% fallidos).
+   - Apagado inteligente al detectar que no restan contactos pendientes, mutando la campaña a `finished`.
+5. **Estadísticas de Rendimiento Puras:** Endpoint especial (GET `/progress`) alimentado por conteo nativo `COUNT(CASE WHEN...)` reduciendo la carga de memoria sobre V8/Node para mostrar los datos calculando los porcentajes exactos de manera progresiva.
 
 ---
 
@@ -33,20 +36,18 @@ _Los siguientes pasos (Analítica/Progreso en `/progress` y el Background Job) s
    ```bash
    cp .env.example .env
    ```
-4. Actualiza las credenciales de base de datos en el nuevo archivo `.env` según tu entorno local.
-5. Inicia o crea una base de datos vacía en PostgreSQL con el nombre estipulado en tu `DB_NAME`.
+4. Actualiza las credenciales de base de datos en el nuevo archivo `.env` según tu motor de base de datos local y asegúrate de crear una base de datos vacía.
 
-## 📦 Ejecución y Migraciones
+## 📦 Ejecución y Base de Datos (Migraciones)
 
-El proyecto cuenta con scripts preparados para levantar el entorno.
-
-Para crear rápidamente las tablas (`campaigns`, `contacts` y `campaign_contacts`), ejecuta de manera automática nuestro script de migración SQL usando ts-node:
+Para crear rápidamente las tablas con restricciones (`campaigns`, `contacts` y `campaign_contacts`), ejecuta de manera automática nuestro seeder interno que cargará de paso usuarios de prueba falsos para ti:
 
 ```bash
-npx ts-node --esm src/config/init-db.ts
+npx ts-node --esm src/config/seed.ts
+# O en Windows: node --loader ts-node/esm src/config/seed.ts
 ```
 
-Una vez instaladas las tablas, levanta el servidor de desarrollo mediante nodemon (que recargará los cambios automáticamente):
+Una vez instaladas las tablas, levanta el servidor de desarrollo mediante **nodemon**:
 
 ```bash
 npm run dev
