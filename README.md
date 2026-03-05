@@ -1,55 +1,121 @@
-# Apify Campaign API
+# 🚀 Apify Campaign API
 
-API REST para la gestión y simulación de envío masivo de campañas de mensajería, desarrollada en **Node.js, Express y TypeScript** utilizando **PostgreSQL** como base de datos con consultas SQL directas.  
-Proyecto desarrollado como prueba técnica.
+API REST profesional diseñada para la gestión y simulación de envío masivo de campañas de mensajería con control de **Rate Limit** y procesamiento en **segundo plano (background)**.
 
-## 🚀 Tecnologías y Arquitectura Utilizadas
+Desarrollada como proyecto robusto en **Node.js**, **Express** y **TypeScript**, utilizando **PostgreSQL** con consultas SQL directas para máxima eficiencia.
+
+---
+
+## 📖 Documentación & Repositorio
+
+- **Swagger UI:** [http://localhost:3000/api-docs/](http://localhost:3000/api-docs/)
+- **Repositorio:** [https://github.com/JeffersonMontoya/apify-campaign-api](https://github.com/JeffersonMontoya/apify-campaign-api)
+
+---
+
+## 🎯 Objetivo del Proyecto
+
+Simular la lógica central de un sistema de campañas que envía mensajes a contactos, asegurando:
+
+- Control estricto de **Rate Limit** (envíos por minuto).
+- Procesamiento persistente en segundo plano.
+- Manejo de estados de campaña (borrador, corriendo, pausada, terminada).
+- Reporte detallado de progreso.
+
+---
+
+## 🛠️ Stack Tecnológico
 
 - **Runtime:** Node.js
 - **Framework:** Express.js
 - **Lenguaje:** TypeScript
-- **Base de Datos:** PostgreSQL (`pg` library para consultas SQL nativas / raw SQL).
+- **Base de Datos:** PostgreSQL (`pg` library para Raw SQL)
 - **Validación:** Zod
-- **Arquitectura:** Estructura Modular/Limpia:
-  - `controllers/`: Manejo de peticiones y respuestas.
-  - `services/`: Lógica de negocio y validaciones de existencia.
-  - `repositories/`: Consultas SQL directas a la base de datos.
-  - `routes/`: Definición de endpoints.
-  - `utils/`: Utilidades como el manejador de respuestas estandarizado.
+- **Documentación:** Swagger (OpenAPI)
 
-## ✅ Funcionalidades Logradas
+---
 
-1. **Estructura Organizada:** Refactorización total a carpetas por responsabilidad (`controllers`, `services`, etc.).
-2. **Manejo de Respuestas:** Sistema estandarizado de respuestas con mensajes claros de éxito y error, incluyendo códigos HTTP adecuados.
-3. **Validación Robusta:** Validación de tipos y requerimientos mediante **Zod** y validaciones de existencia en base de datos en la capa de servicios.
-4. **Creación y Configuración:** Creación de campañas con control de `rate_limit_per_minute`.
-5. **Contactos:** Inyección rápida de listas de contactos.
-6. **Estadísticas:** Endpoint (GET `/progress`) que calcula porcentajes de envío en tiempo real.
+## 🗄️ Modelo de Datos
 
+El sistema se basa en 3 entidades principales:
 
-## 🛠️ Instrucciones de Instalación Local
+1. **Campaigns:** Almacena la configuración de la campaña y su estado actual (`draft`, `running`, `paused`, `finished`).
+2. **Contacts:** Maestro de contactos con nombre y teléfono.
+3. **Campaign_contacts:** Tabla relacional que gestiona el estado individual de cada envío (`pending`, `sent`, `failed`).
 
-1. Clona el repositorio.
-2. Instala las dependencias:
-   ```bash
-   npm install
-   ```
-3. Configura las variables de entorno:
-   ```bash
-   cp .env.example .env
-   ```
-4. Actualiza las credenciales en el archivo `.env`.
+---
 
-## 📦 Base de Datos y Ejecución
+## 🛣️ Endpoints Principales
 
-1. Asegúrate de tener PostgreSQL corriendo y crea la base de datos.
-2. Ejecuta el script SQL en `init.sql` o usa el seeder (si está disponible):
-   ```bash
-   node --loader ts-node/esm src/config/seed.ts
-   ```
-3. Inicia el servidor de desarrollo:
-   ```bash
-   npm run dev
-   ```
+| Método | Endpoint                  | Descripción                                                  |
+| :----- | :------------------------ | :----------------------------------------------------------- |
+| `POST` | `/campaigns`              | Crear nueva campaña con `rate_limit_per_minute`.             |
+| `POST` | `/campaigns/:id/contacts` | Asociar una lista de contactos a una campaña.                |
+| `POST` | `/campaigns/:id/start`    | Iniciar el procesamiento de la campaña.                      |
+| `POST` | `/campaigns/:id/pause`    | Pausar el procesamiento.                                     |
+| `POST` | `/campaigns/:id/resume`   | Reanudar una campaña pausada.                                |
+| `GET`  | `/campaigns/:id/progress` | Obtener estadísticas en tiempo real (%, enviados, fallidos). |
 
-El servidor estará en `http://localhost:3000`.
+---
+
+## ⚙️ Lógica de Procesamiento
+
+El sistema cuenta con un **Motor de Procesamiento Background** (`setInterval`) que:
+
+- Solo procesa campañas en estado `running`.
+- Respeta el `rate_limit_per_minute` definido por campaña.
+- **Simulación Realista:** Marca el 90% como `sent` y el 10% como `failed` con errores simulados.
+- Cambia automáticamente a `finished` cuando no quedan contactos pendientes.
+
+---
+
+## 🚀 Instalación y Configuración
+
+### 1. Clonar y Dependencias
+
+```bash
+git clone https://github.com/JeffersonMontoya/apify-campaign-api.git
+cd apify-campaign-api
+npm install
+```
+
+### 2. Variables de Entorno (.env)
+
+El proyecto incluye un archivo `.env.example`.
+
+- **¿Cuál dejar?**: Debes mantener **ambos**.
+- El `.env.example` se sube al repositorio como plantilla.
+- El `.env` es tu archivo local (ignorado por Git) donde pondrás tus credenciales reales.
+
+```bash
+cp .env.example .env
+# Luego edita .env con tus datos de PostgreSQL
+```
+
+### 3. Base de Datos
+
+Ejecuta el script SQL incluido para crear las tablas:
+
+```bash
+# Puedes usar psql o tu cliente favorito con init.sql
+```
+
+O usa los scripts automáticos:
+
+```bash
+# Crear tablas
+npm run db:init
+
+# Insertar contactos de prueba
+npm run seed
+```
+
+### 4. Ejecución
+
+```bash
+# Modo Desarrollo
+npm run dev
+```
+
+El servidor estará disponible en `http://localhost:3000`.
+No olvides visitar `http://localhost:3000/api-docs/` para probar los endpoints interactivamente.
