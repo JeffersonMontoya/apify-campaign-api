@@ -30,25 +30,6 @@ export class CampaignController {
     });
   }
 
-  /**
-   * @openapi
-   * /campaigns:
-   *   post:
-   *     tags:
-   *       - Campaigns
-   *     summary: Crea una nueva campaña
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/Campaign'
-   *     responses:
-   *       201:
-   *         description: Campaña creada con éxito
-   *       400:
-   *         description: Error de validación o datos incompletos
-   */
   async create(req: Request, res: Response) {
     try {
       if (!req.body || Object.keys(req.body).length === 0) {
@@ -78,36 +59,6 @@ export class CampaignController {
     }
   }
 
-  /**
-   * @openapi
-   * /campaigns/{id}/contacts:
-   *   post:
-   *     tags:
-   *       - Campaigns
-   *     summary: Agrega contactos a una campaña existente
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               contact_ids:
-   *                 type: array
-   *                 items:
-   *                   type: integer
-   *     responses:
-   *       200:
-   *         description: Contactos vinculados correctamente
-   *       400:
-   *         description: Error en los datos o contactos no encontrados
-   */
   async addContacts(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -137,23 +88,6 @@ export class CampaignController {
     }
   }
 
-  /**
-   * @openapi
-   * /campaigns/{id}/start:
-   *   post:
-   *     tags:
-   *       - Campaigns
-   *     summary: Inicia el envío de la campaña
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *     responses:
-   *       200:
-   *         description: Campaña iniciada
-   */
   async start(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -164,23 +98,6 @@ export class CampaignController {
     }
   }
 
-  /**
-   * @openapi
-   * /campaigns/{id}/pause:
-   *   post:
-   *     tags:
-   *       - Campaigns
-   *     summary: Pausa una campaña en ejecución
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *     responses:
-   *       200:
-   *         description: Campaña pausada
-   */
   async pause(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -191,23 +108,6 @@ export class CampaignController {
     }
   }
 
-  /**
-   * @openapi
-   * /campaigns/{id}/resume:
-   *   post:
-   *     tags:
-   *       - Campaigns
-   *     summary: Reanuda una campaña pausada
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *     responses:
-   *       200:
-   *         description: Campaña reanudada
-   */
   async resume(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -218,23 +118,6 @@ export class CampaignController {
     }
   }
 
-  /**
-   * @openapi
-   * /campaigns/{id}/progress:
-   *   get:
-   *     tags:
-   *       - Campaigns
-   *     summary: Obtiene el progreso real de la campaña
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *     responses:
-   *       200:
-   *         description: Datos de progreso obtenidos
-   */
   async getProgress(req: Request, res: Response) {
     try {
       const { id } = req.params;
